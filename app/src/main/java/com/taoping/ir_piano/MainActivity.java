@@ -40,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
         keyboard.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-
                 keyboard.pianoOnTouch(view, motionEvent);
 //                Log.d(TAG, "onTouch: pressed Key:" + keyboard.pressedKey + ": " + motionEvent.getAction());
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN && keyboard.pressedKey != -1)
@@ -59,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void notePressDown(){
+        //是不是用线程来做，否则主UI卡住
         IRSender.sendIRNote(this, keyboard.pressedKey);
     }
 
