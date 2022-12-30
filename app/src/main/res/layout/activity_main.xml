@@ -6,14 +6,22 @@
     android:background="#CCCCCC"
     >
 
+    <Button
+        android:id="@+id/switchBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_gravity="right"
+        android:text="Switch Playing Mode"/>
+
     <com.taoping.ir_piano.PianoKeyboardView
         android:id="@+id/piano_keyboard_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="#CCCCCC"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"
+        android:background="#CCCCCC"
 
 
         />

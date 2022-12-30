@@ -16,7 +16,7 @@ import android.view.MotionEvent;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PianoKeyboardView extends View implements OnTouchListener {
+public class PianoKeyboardView extends View {
     private static final int NUM_KEYS = 36;
     private static final int KEYBOARD_CORNER_RADIUS = 10;
     private static int WHITE_KEY_WIDTH = 40;
@@ -34,6 +34,8 @@ public class PianoKeyboardView extends View implements OnTouchListener {
     private Paint blackKeyPressedPaint;
     //存储每个键的按下状态
     private int[] keyStates;
+
+    public int pressedKey = -1;
 
 
     public PianoKeyboardView(Context context) {
@@ -81,7 +83,7 @@ public class PianoKeyboardView extends View implements OnTouchListener {
         whiteKeyFullIndexReverse.put(5, 9);
         whiteKeyFullIndexReverse.put(6, 11);
 
-        setOnTouchListener(this);
+//        setOnTouchListener(this);
     }
 
     @Override
@@ -129,17 +131,18 @@ public class PianoKeyboardView extends View implements OnTouchListener {
         return index % 12 != 1 && index % 12 != 3 && index % 12 != 6 && index % 12 != 8 && index % 12 != 10;
     }
 
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
+    public boolean pianoOnTouch(View v, MotionEvent event) {
         int action = event.getAction();
-        if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_MOVE) {
+        if (action == MotionEvent.ACTION_DOWN ) {
             int keyIndex = getKeyIndexAtPosition(event.getX(), event.getY());
+            pressedKey = keyIndex;
             Log.d(TAG, "onTouch: pressed key index: " + keyIndex);
             if (keyIndex != -1) {
                 keyStates[keyIndex] = 1;
                 invalidate();
             }
         } else if (action == MotionEvent.ACTION_UP) {
+            pressedKey = -1;
             resetKeyStates();
             invalidate();
         }
@@ -193,7 +196,4 @@ public class PianoKeyboardView extends View implements OnTouchListener {
 //        Log.d(TAG, "onSizeChanged: black_w: " + BLACK_KEY_WIDTH + ", white_h: " + BLACK_KEY_HEIGHT);
     }
 
-    private void sendIRNote(int keyIndex){
-        IRSender.sendIRNote((Activity) this.getContext().getApplicationContext(), keyIndex);
-    }
 }
