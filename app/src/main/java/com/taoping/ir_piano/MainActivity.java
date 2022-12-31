@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         keyboard.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                keyboard.pianoOnTouch(view, motionEvent);
+                keyboard.pianoOnTouch(motionEvent);
 //                Log.d(TAG, "onTouch: pressed Key:" + keyboard.pressedKey + ": " + motionEvent.getAction());
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN && keyboard.pressedKey != -1)
                     notePressDown();

@@ -2,16 +2,14 @@ package com.taoping.ir_piano;
 
 import static android.content.ContentValues.TAG;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.View;
-import android.view.View.OnTouchListener;
 import android.view.MotionEvent;
+import android.view.View;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,8 +23,8 @@ public class PianoKeyboardView extends View {
     private static int BLACK_KEY_HEIGHT = 120;
 //    private static int KEY_SPACING = WHITE_KEY_WIDTH / 2;
 
-    private static final Map<Integer, Integer> whiteKeyIndex = new HashMap<Integer, Integer>();
-    private static final Map<Integer, Integer> whiteKeyFullIndexReverse = new HashMap<Integer, Integer>();
+    private static final Map<Integer, Integer> whiteKeyIndex = new HashMap<>();
+    private static final Map<Integer, Integer> whiteKeyFullIndexReverse = new HashMap<>();
 
     private Paint whiteKeyPaint;
     private Paint blackKeyPaint;
@@ -131,7 +129,7 @@ public class PianoKeyboardView extends View {
         return index % 12 != 1 && index % 12 != 3 && index % 12 != 6 && index % 12 != 8 && index % 12 != 10;
     }
 
-    public boolean pianoOnTouch(View v, MotionEvent event) {
+    public void pianoOnTouch(MotionEvent event) {
         int action = event.getAction();
         if (action == MotionEvent.ACTION_DOWN ) {
             int keyIndex = getKeyIndexAtPosition(event.getX(), event.getY());
@@ -146,7 +144,6 @@ public class PianoKeyboardView extends View {
             resetKeyStates();
             invalidate();
         }
-        return true;
     }
 
     private int getKeyIndexAtPosition(float x, float y) {
@@ -183,8 +180,8 @@ public class PianoKeyboardView extends View {
     }
 
     @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
+    protected void onSizeChanged(int w, int h, int old_w, int old_h) {
+        super.onSizeChanged(w, h, old_w, old_h);
         WHITE_KEY_WIDTH = (w - 20 * 10) / 21; //每个白健中间隔10个像素的间隔，共有20个间隔
         BLACK_KEY_WIDTH = (int)(WHITE_KEY_WIDTH * 0.8);
         WHITE_KEY_HEIGHT = h;
