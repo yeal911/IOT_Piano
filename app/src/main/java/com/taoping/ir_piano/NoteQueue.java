@@ -64,6 +64,7 @@ public class NoteQueue {
 
     public static void startSendingNote(String sendingMode){
         sendStatus = true;
+        NoteQueue.noteQueue.clear();
         sendNotes(sendingMode);
     }
 
