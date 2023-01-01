@@ -15,13 +15,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PianoKeyboardView extends View {
-    private static final int NUM_KEYS = 36;
-    private static final int KEYBOARD_CORNER_RADIUS = 10;
-    private static int WHITE_KEY_WIDTH = 40;
-    private static int WHITE_KEY_HEIGHT = 200;
-    private static int BLACK_KEY_WIDTH = 30;
-    private static int BLACK_KEY_HEIGHT = 120;
+    public static final int NUM_KEYS = 36;
+    public static final int KEYBOARD_CORNER_RADIUS = 10;
+    public static int WHITE_KEY_WIDTH = 40;
+    public static int WHITE_KEY_HEIGHT = 200;
+    public static int BLACK_KEY_WIDTH = 30;
+    public static int BLACK_KEY_HEIGHT = 120;
 //    private static int KEY_SPACING = WHITE_KEY_WIDTH / 2;
+    public static final Map<Integer, String> keyNoteName = new HashMap<>();
 
     private static final Map<Integer, Integer> whiteKeyIndex = new HashMap<>();
     private static final Map<Integer, Integer> whiteKeyFullIndexReverse = new HashMap<>();
@@ -34,6 +35,7 @@ public class PianoKeyboardView extends View {
     private int[] keyStates;
 
     public int pressedKey = -1;
+    public int pressedAreaWhiteKey = -1;
 
 
     public PianoKeyboardView(Context context) {
@@ -81,6 +83,19 @@ public class PianoKeyboardView extends View {
         whiteKeyFullIndexReverse.put(5, 9);
         whiteKeyFullIndexReverse.put(6, 11);
 
+        keyNoteName.put(0,"C");
+        keyNoteName.put(1,"C#");
+        keyNoteName.put(2,"D");
+        keyNoteName.put(3,"D#");
+        keyNoteName.put(4,"E");
+        keyNoteName.put(5,"F");
+        keyNoteName.put(6,"F#");
+        keyNoteName.put(7,"G");
+        keyNoteName.put(8,"G#");
+        keyNoteName.put(9,"A");
+        keyNoteName.put(10,"A#");
+        keyNoteName.put(11,"B");
+
 //        setOnTouchListener(this);
     }
 
@@ -100,7 +115,7 @@ public class PianoKeyboardView extends View {
     }
 
     private void drawWhiteKey(Canvas canvas, int index) {
-        int whiteKeyNumber = ((index / 12 * 7) + (int)whiteKeyIndex.get(index % 12));
+        int whiteKeyNumber = ((index / 12 * 7) + whiteKeyIndex.get(index % 12));
         int x = whiteKeyNumber * (WHITE_KEY_WIDTH + 10);
 //        Log.d(TAG, "drawWhiteKey: index: " + index + ", white key number: " + whiteKeyNumber + ", x: " + x);
         int y = 0;
@@ -113,7 +128,7 @@ public class PianoKeyboardView extends View {
 
     private void drawBlackKey(Canvas canvas, int index) {
         //黑键的x坐标都是位于前一个白健加一半的位置
-        int previousWhiteKeyIndex = ((index / 12 * 7) + (int)whiteKeyIndex.get((index-1) % 12));
+        int previousWhiteKeyIndex = ((index / 12 * 7) + whiteKeyIndex.get((index-1) % 12));
         int x = previousWhiteKeyIndex * (WHITE_KEY_WIDTH + 10) + (WHITE_KEY_WIDTH - (BLACK_KEY_WIDTH - 10)/2);
 //        Log.d(TAG, "drawBlackKey: previousWhiteKeyIndex: " + previousWhiteKeyIndex + ", black_x: " + x);
         int y = 0;
@@ -124,7 +139,7 @@ public class PianoKeyboardView extends View {
         }
     }
 
-    private boolean isWhiteKey(int index) {
+    public boolean isWhiteKey(int index) {
         // Black keys are at indices 1, 3, 6, 8, 10
         return index % 12 != 1 && index % 12 != 3 && index % 12 != 6 && index % 12 != 8 && index % 12 != 10;
     }
@@ -148,7 +163,9 @@ public class PianoKeyboardView extends View {
 
     private int getKeyIndexAtPosition(float x, float y) {
         int whiteKeyIndex = (int) (x / (WHITE_KEY_WIDTH + 10));
+        pressedAreaWhiteKey = whiteKeyIndex;
         if(whiteKeyIndex < 0 || whiteKeyIndex >= NUM_KEYS) {
+            pressedAreaWhiteKey = -1;
             return -1;
         }
         if(y < BLACK_KEY_HEIGHT){
@@ -164,6 +181,7 @@ public class PianoKeyboardView extends View {
             return getWhiteKeyIndex(whiteKeyIndex);
     }
 
+    //return full white key index(considering black key, total is 36) based on only white key index (considering only white keys)
     private int getWhiteKeyIndex(int index){
         return index / 7 * 12 + whiteKeyFullIndexReverse.get(index % 7);
     }
@@ -179,6 +197,15 @@ public class PianoKeyboardView extends View {
         }
     }
 
+    //根据键的序号，返回该键的x坐标值
+    public int getXByKeyIndex(){
+        if(isWhiteKey(this.pressedKey)){
+            return this.pressedAreaWhiteKey * (WHITE_KEY_WIDTH+10) ; //每个白键中间隔10dp，键盘左边margin也是10
+        }else{
+            return (((this.pressedKey-1)/12*7+whiteKeyIndex.get((this.pressedKey-1) % 12)) * (WHITE_KEY_WIDTH+10) ) + (WHITE_KEY_WIDTH - (BLACK_KEY_WIDTH - 10)/2);
+        }
+    }
+
     @Override
     protected void onSizeChanged(int w, int h, int old_w, int old_h) {
         super.onSizeChanged(w, h, old_w, old_h);
@@ -186,11 +213,6 @@ public class PianoKeyboardView extends View {
         BLACK_KEY_WIDTH = (int)(WHITE_KEY_WIDTH * 0.8);
         WHITE_KEY_HEIGHT = h;
         BLACK_KEY_HEIGHT = WHITE_KEY_HEIGHT * 2 / 3;
-//        KEY_SPACING = WHITE_KEY_WIDTH / 2;
-//        Log.d(TAG, "onSizeChanged: executed");
-//        Log.d(TAG, "onSizeChanged: w: " + w + ", h: " + h);
-//        Log.d(TAG, "onSizeChanged: white_w: " + WHITE_KEY_WIDTH + ", white_h: " + WHITE_KEY_HEIGHT);
-//        Log.d(TAG, "onSizeChanged: black_w: " + BLACK_KEY_WIDTH + ", white_h: " + BLACK_KEY_HEIGHT);
     }
 
 }
