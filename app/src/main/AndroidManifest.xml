@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.taoping.ir_piano">
 
+    <!-- 红外遥控 -->
+    <uses-permission android:name="android.permission.TRANSMIT_IR" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -18,11 +22,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".PianoKeyboardView"/>
     </application>
-
-    <!-- 红外遥控 -->
-    <uses-permission android:name="android.permission.TRANSMIT_IR" />
     <!-- 仅在支持红外的设备上运行 -->
     <uses-feature android:name="android.hardware.ConsumerIrManager" android:required="true" />
 </manifest>

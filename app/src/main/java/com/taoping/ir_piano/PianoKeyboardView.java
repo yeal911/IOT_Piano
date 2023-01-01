@@ -37,7 +37,6 @@ public class PianoKeyboardView extends View {
     public int pressedKey = -1;
     public int pressedAreaWhiteKey = -1;
 
-
     public PianoKeyboardView(Context context) {
         this(context, null);
     }
@@ -149,7 +148,7 @@ public class PianoKeyboardView extends View {
         if (action == MotionEvent.ACTION_DOWN ) {
             int keyIndex = getKeyIndexAtPosition(event.getX(), event.getY());
             pressedKey = keyIndex;
-            Log.d(TAG, "onTouch: pressed key index: " + keyIndex);
+//            Log.d(TAG, "onTouch: pressed key index: " + keyIndex);
             if (keyIndex != -1) {
                 keyStates[keyIndex] = 1;
                 invalidate();
