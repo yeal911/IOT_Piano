@@ -37,9 +37,9 @@ public class ReceiverSearcher {
                     System.out.println("Response: " + response);
                     socket.close();
                     System.out.println("Response ip: " + receiverIP);
-                    mainActivity.setIpText(receiverIP + ":8888");
                     NoteQueue.receiverIP = receiverIP;
                     NoteQueue.startSendingNote("WIFI");
+                    mainActivity.setIpText(receiverIP + ":8888");
                 } catch (Exception e) {
                     if(e instanceof SocketTimeoutException){
                         mainActivity.setIpText("No receiver found!");

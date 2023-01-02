@@ -126,8 +126,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setIpText(String ip){
-        this.ipText.setText(ip);
         Looper.prepare();
+        this.ipText.setText(ip);
         if(ip.startsWith("No"))
             showMessage("No IP receiver found.");
         else
