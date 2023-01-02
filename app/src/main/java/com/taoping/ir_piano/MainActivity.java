@@ -1,9 +1,14 @@
 package com.taoping.ir_piano;
 
+import static android.content.ContentValues.TAG;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.annotation.SuppressLint;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
@@ -27,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView noteText;
     private TextView ipText;
     private TextView noteCoverText;
+    private boolean muteSound = false; //手机是否播放音，默认播放
+    private AssetManager assetManager; //在MainActivity中初始化
 
     @SuppressLint({"ClickableViewAccessibility", "SetTextI18n"})
     @Override
@@ -36,8 +43,8 @@ public class MainActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).hide();
         @SuppressLint("UseSwitchCompatOrMaterialCode") final Switch transmissionSwitch = findViewById(R.id.switchWifiIR);
         final Button searchIPBtn = (Button) findViewById(R.id.searchReceiverBtn);
-        final Button switchModeBtn = (Button) findViewById(R.id.switchBtn);
         keyboard = (PianoKeyboardView) findViewById(R.id.piano_keyboard_view);
+        assetManager = getAssets();
         noteText = (TextView) findViewById(R.id.noteText);
         ipText = (TextView) findViewById(R.id.ipText);
         noteCoverText = (TextView) findViewById(R.id.coverTextView);
@@ -55,19 +62,13 @@ public class MainActivity extends AppCompatActivity {
                 showMessage("send notes via WIFI");
             }
         });
-
-        switchModeBtn.setOnClickListener(v -> {
-            switchMode();
-            // Perform action on click
-            showMessage("Mode switched.");
-        });
-
         searchIPBtn.setOnClickListener(v -> {
             searchReceiverIP();
             // Perform action on click
             showMessage("Searching for IP receiver...");
         });
 
+        //点击后返回true，避免触发下面的琴键的onTouch事件
         noteCoverText.setOnTouchListener((view, motionEvent) -> {
             return true;
         });
@@ -103,17 +104,13 @@ public class MainActivity extends AppCompatActivity {
             }});
     }
 
-    //
+    //局域网内广播消息，查找服务器
     private void searchReceiverIP() {
         try {
             ReceiverSearcher.searchReceiver(this);
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private void switchMode(){
-//        IRSender.switchMode(this);
     }
 
     public void setIpText(String ip){
@@ -127,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void notePressDown(){
+        playNoteSound();
         ViewGroup.LayoutParams noteTextParam = noteText.getLayoutParams();
         if(keyboard.isWhiteKey(keyboard.pressedKey))
             noteTextParam.width = PianoKeyboardView.WHITE_KEY_WIDTH;
@@ -157,10 +155,8 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
     }
 
+    //选择低音区或者高音区的时候，将不可用的键隐藏起来
     private void coverUnreachableKeys(){
-//        ViewGroup.LayoutParams coverTextParam = noteText.getLayoutParams();
-//        coverTextParam.height = keyboard.getHeight();
-//        coverTextParam.width = (keyboard.WHITE_KEY_WIDTH + 10) * 5;
         ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(
                 (keyboard.WHITE_KEY_WIDTH + 10) * 5,
                 keyboard.getHeight());
@@ -172,11 +168,30 @@ public class MainActivity extends AppCompatActivity {
             noteCoverText.setLayoutParams(params);
         }else if(NoteQueue.keyboardToneLevel.equals("HIG")){
             noteCoverText.setVisibility(View.VISIBLE);
+            params.width = (keyboard.WHITE_KEY_WIDTH + 10) * 6 + 10;
             params.rightToRight = R.id.piano_keyboard_view;
             noteCoverText.setLayoutParams(params);
         }else{
             noteCoverText.setVisibility(View.INVISIBLE);
         }
 
+    }
+
+    //播放对应的音
+    private void playNoteSound() {
+//        Log.d(TAG, "playNoteSound: " + NoteQueue.keyboardToneLevel + ", " + keyboard.pressedKey + "; " + keyboard.note2Mp3File.get(NoteQueue.keyboardToneLevel+keyboard.pressedKey));
+        if(!muteSound){
+            try {
+                AssetFileDescriptor afd = assetManager.openFd(keyboard.note2Mp3File.get(NoteQueue.keyboardToneLevel+keyboard.pressedKey));
+//                Log.d(TAG, "playNoteSound: " + keyboard.note2Mp3File.get(NoteQueue.keyboardToneLevel+keyboard.pressedKey));
+                MediaPlayer mediaPlayer = new MediaPlayer();
+                mediaPlayer.reset();
+                mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+                mediaPlayer.prepare();
+                mediaPlayer.start();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
