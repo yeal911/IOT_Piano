@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Objects.requireNonNull(getSupportActionBar()).hide();
         @SuppressLint("UseSwitchCompatOrMaterialCode") final Switch transmissionSwitch = findViewById(R.id.switchWifiIR);
+        @SuppressLint("UseSwitchCompatOrMaterialCode") final Switch muteSwitch = findViewById(R.id.muteSwitch);
         final Button searchIPBtn = (Button) findViewById(R.id.searchReceiverBtn);
         keyboard = (PianoKeyboardView) findViewById(R.id.piano_keyboard_view);
         assetManager = getAssets();
@@ -60,6 +61,17 @@ public class MainActivity extends AppCompatActivity {
                 ipText.setText(ReceiverSearcher.receiverIP + ":8888");
                 searchIPBtn.setVisibility(View.VISIBLE);
                 showMessage("send notes via WIFI");
+            }
+        });
+        muteSwitch.setOnClickListener(view -> {
+            if(muteSwitch.isChecked()){
+                muteSwitch.setText("Unmuted");
+                muteSound = false;
+                showMessage("Unmuted.");
+            }else{
+                muteSwitch.setText("Muted");
+                muteSound = true;
+                showMessage("Muted.");
             }
         });
         searchIPBtn.setOnClickListener(v -> {

@@ -12,93 +12,122 @@
         android:background="#CCCCCC"
         android:layout_margin="5dp"
         android:layout_height="40dp">
-        <TextView
-            android:id="@+id/captionText"
-            android:layout_width="70dp"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/ReceiverLayout"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:gravity="center_vertical"
-            android:text="Receiver:"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="TouchTargetSizeCheck" />
-        <TextView
-            android:id="@+id/ipText"
-            android:layout_width="120dp"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:textColor="#0000FF"
-            android:gravity="center_vertical"
-            android:text=""
-            android:tooltipText="input the receiver's IP"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@+id/captionText"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="TouchTargetSizeCheck" />
-
-        <Button
-            android:id="@+id/searchReceiverBtn"
+            android:background="@drawable/group_background">
+            <TextView
+                android:id="@+id/captionText"
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:gravity="center_vertical"
+                android:text="Receiver:"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="TouchTargetSizeCheck" />
+            <TextView
+                android:id="@+id/ipText"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:textColor="#0000FF"
+                android:gravity="center_vertical"
+                android:text=""
+                android:tooltipText="input the receiver's IP"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@+id/captionText"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="TouchTargetSizeCheck" />
+            <Button
+                android:id="@+id/searchReceiverBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:text="Search"
+                app:layout_constraintLeft_toRightOf="@+id/ipText"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="TouchTargetSizeCheck" />
+            <Switch
+                android:id="@+id/switchWifiIR"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="Wifi"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@+id/searchReceiverBtn"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="UseSwitchCompatOrMaterialXml,TouchTargetSizeCheck" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/pianoSetLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:text="Search Receiver"
-            app:layout_constraintLeft_toRightOf="@+id/ipText"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="TouchTargetSizeCheck" />
-
-        <Switch
-            android:id="@+id/switchWifiIR"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Wifi"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/separatorView"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="UseSwitchCompatOrMaterialXml,TouchTargetSizeCheck" />
-        <View
-            android:id="@+id/separatorView"
-            android:layout_width="2dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_horizontal"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_margin="5dp"
-            app:layout_constraintEnd_toStartOf="@+id/toneRadioGroup"
-            android:background="#1E90FF" />
-        <RadioGroup
-            android:id="@+id/toneRadioGroup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:tooltipText="select the keyboard tone coverage"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:orientation="horizontal"
             app:layout_constraintRight_toRightOf="parent"
-            >
-
-            <RadioButton
-                android:id="@+id/lowToneRadioButton"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginEnd="5dp"
+            android:background="@drawable/group_background">
+            <Switch
+                android:id="@+id/muteSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Low"
-                tools:ignore="TouchTargetSizeCheck" />
-
-            <RadioButton
-                android:id="@+id/midToneRadioButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="Unmuted"
                 android:checked="true"
-                android:text="Middle"
-                tools:ignore="TouchTargetSizeCheck" />
-
-            <RadioButton
-                android:id="@+id/highToneRadioButton"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="UseSwitchCompatOrMaterialXml" />
+            <View
+                android:id="@+id/separatorView"
+                android:layout_width="2dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center_horizontal"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_margin="3dp"
+                app:layout_constraintStart_toEndOf="@+id/muteSwitch"
+                android:background="#1E90FF" />
+            <RadioGroup
+                android:id="@+id/toneRadioGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="High"
-                tools:ignore="TouchTargetSizeCheck" />
-        </RadioGroup>
+                android:tooltipText="select the keyboard tone coverage"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:orientation="horizontal"
+                app:layout_constraintLeft_toRightOf="@+id/separatorView"
+                >
+
+                <RadioButton
+                    android:id="@+id/lowToneRadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Low"
+                    tools:ignore="TouchTargetSizeCheck" />
+
+                <RadioButton
+                    android:id="@+id/midToneRadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="Middle"
+                    tools:ignore="TouchTargetSizeCheck" />
+
+                <RadioButton
+                    android:id="@+id/highToneRadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="High"
+                    tools:ignore="TouchTargetSizeCheck" />
+            </RadioGroup>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
