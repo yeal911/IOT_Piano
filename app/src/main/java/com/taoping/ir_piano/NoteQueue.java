@@ -11,6 +11,7 @@ public class NoteQueue {
     public static final ArrayDeque<Integer> noteQueue = new ArrayDeque<Integer>();
     public static boolean sendStatus = true;
     public static String receiverIP = null;
+    public static String keyboardToneLevel = "MID"; //存储当前键盘的音区，默认中音区MID。LOW低音区，HIG高音区
 
     //从队首返回一个音符
     public static int popNote(){
@@ -32,29 +33,30 @@ public class NoteQueue {
             public void run() {
                 // 线程的主体代码
                 try {
-                    // 创建一个 DatagramSocket 实例
-                    DatagramSocket socket = new DatagramSocket();
-                    // 创建一个 DatagramPacket 实例，用于发送数据
-                    InetAddress address = InetAddress.getByName(receiverIP);
-                    int port = 8888;
-                    while(NoteQueue.sendStatus){
-                        if(sendingMode.equals("WIFI")){ //通过wifi发送
+                    if(sendingMode.equals("WIFI")){ //通过wifi发送
+                        // 创建一个 DatagramSocket 实例
+                        DatagramSocket socket = new DatagramSocket();
+                        // 创建一个 DatagramPacket 实例，用于发送数据
+                        InetAddress address = InetAddress.getByName(receiverIP);
+                        int port = 8888;
+                        while(NoteQueue.sendStatus){
                             // 要发送的字符串
-                            int message = popNote();
-                            Log.d("NoteQueue", "sending " + message);
-                            if(message == -1)
+                            int noteName = popNote();
+                            if(noteName == -1)
                                 continue;
+                            String message = keyboardToneLevel + noteName;
+                            Log.d("NoteQueue", "sending " + message);
                             // 将字符串转换为字节数组
-                            byte[] data = Integer.toString(message).getBytes();
+                            byte[] data = message.getBytes();
                             DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
                             // 发送数据包
                             socket.send(packet);
-                        }else{ //通过IR发送
-
                         }
+                        // 关闭套接字
+                        socket.close();
+                    }else{ //通过IR发送
+
                     }
-                    // 关闭套接字
-                    socket.close();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

@@ -36,14 +36,16 @@
             app:layout_constraintLeft_toRightOf="@+id/captionText"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="TouchTargetSizeCheck" />
+
         <Button
             android:id="@+id/searchReceiverBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintLeft_toRightOf="@+id/ipText"
             android:gravity="center_vertical"
-            android:text="Search Receiver"/>
+            android:text="Search Receiver"
+            app:layout_constraintLeft_toRightOf="@+id/ipText"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="TouchTargetSizeCheck" />
 
         <Switch
             android:id="@+id/switchWifiIR"
@@ -51,13 +53,58 @@
             android:layout_height="wrap_content"
             android:text="Wifi"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/switchBtn"
+            app:layout_constraintEnd_toStartOf="@+id/separatorView"
             app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="UseSwitchCompatOrMaterialXml" />
+            tools:ignore="UseSwitchCompatOrMaterialXml,TouchTargetSizeCheck" />
+        <View
+            android:id="@+id/separatorView"
+            android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_margin="5dp"
+            app:layout_constraintEnd_toStartOf="@+id/toneRadioGroup"
+            android:background="#1E90FF" />
+        <RadioGroup
+            android:id="@+id/toneRadioGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:tooltipText="select the keyboard tone coverage"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:orientation="horizontal"
+            app:layout_constraintRight_toRightOf="parent"
+            >
+
+            <RadioButton
+                android:id="@+id/lowToneRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Low"
+                tools:ignore="TouchTargetSizeCheck" />
+
+            <RadioButton
+                android:id="@+id/midToneRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="Middle"
+                tools:ignore="TouchTargetSizeCheck" />
+
+            <RadioButton
+                android:id="@+id/highToneRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="High"
+                tools:ignore="TouchTargetSizeCheck" />
+        </RadioGroup>
+
         <Button
             android:id="@+id/switchBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             android:gravity="center_vertical"
@@ -70,6 +117,7 @@
         android:background="#CCCCCC"
         android:layout_margin="5dp"
         android:layout_height="wrap_content">
+
         <com.taoping.ir_piano.PianoKeyboardView
             android:id="@+id/piano_keyboard_view"
             android:layout_width="wrap_content"
@@ -83,6 +131,19 @@
             app:layout_constraintRight_toRightOf="parent"
             android:background="#CCCCCC"
             />
+        <TextView
+            android:id="@+id/coverTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:background="@color/black"
+            android:visibility="gone"
+            android:ems="10"
+            android:alpha="0.8"
+            android:text=""
+            tools:ignore="TouchTargetSizeCheck" />
 
         <ViewAnimator
             android:id="@+id/animator"

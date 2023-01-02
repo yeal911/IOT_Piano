@@ -35,11 +35,11 @@ public class ReceiverSearcher {
                     InetAddress receiverAddress = packet.getAddress();
                     receiverIP = receiverAddress.getHostName();
                     System.out.println("Response: " + response);
+                    socket.close();
                     System.out.println("Response ip: " + receiverIP);
                     mainActivity.setIpText(receiverIP + ":8888");
                     NoteQueue.receiverIP = receiverIP;
                     NoteQueue.startSendingNote("WIFI");
-                    socket.close();
                 } catch (Exception e) {
                     if(e instanceof SocketTimeoutException){
                         mainActivity.setIpText("No receiver found!");
