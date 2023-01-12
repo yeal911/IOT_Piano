@@ -1,5 +1,6 @@
 package com.taoping.ir_piano;
 
+import android.util.Log;
 import android.widget.TextView;
 
 import java.net.DatagramPacket;
@@ -16,6 +17,7 @@ public class ReceiverSearcher {
                 try {
                     // 给定广播地址和端口
                     InetAddress address = InetAddress.getByName("192.168.1.255");
+                    Log.d("ReceiverSearcher", "this IP: " + InetAddress.getLocalHost().getHostAddress());
                     int port = 8888;
 
                     // 创建数据报并发送

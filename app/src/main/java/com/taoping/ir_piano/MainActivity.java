@@ -32,9 +32,12 @@ public class MainActivity extends AppCompatActivity {
     private TextView noteText;
     private TextView ipText;
     private Button searchIPBtn;
+    private Button sendNoteBtn;
     private TextView noteCoverText;
     private boolean muteSound = false; //手机是否播放音，默认播放
     private AssetManager assetManager; //在MainActivity中初始化
+    private long keyPreviousInterval; //上一个键被按下的时间，单位毫秒
+    private int keyPreviousPressed = -1;
 
     @SuppressLint({"ClickableViewAccessibility", "SetTextI18n"})
     @Override
@@ -45,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
         @SuppressLint("UseSwitchCompatOrMaterialCode") final Switch transmissionSwitch = findViewById(R.id.switchWifiIR);
         @SuppressLint("UseSwitchCompatOrMaterialCode") final Switch muteSwitch = findViewById(R.id.muteSwitch);
         searchIPBtn = (Button) findViewById(R.id.searchReceiverBtn);
+        sendNoteBtn = (Button) findViewById(R.id.sendNoteBtn);
         keyboard = (PianoKeyboardView) findViewById(R.id.piano_keyboard_view);
         assetManager = getAssets();
         noteText = (TextView) findViewById(R.id.noteText);
@@ -54,11 +58,13 @@ public class MainActivity extends AppCompatActivity {
         transmissionSwitch.setOnClickListener(view -> {
             if(transmissionSwitch.isChecked()){
                 transmissionSwitch.setText("   IR");
+                NoteQueue.sendingChannel = "IR";
                 ipText.setText("IR Sensor");
                 searchIPBtn.setVisibility(View.INVISIBLE);
                 showMessage("send notes via IR");
             }else{
                 transmissionSwitch.setText("Wifi");
+                NoteQueue.sendingChannel = "WIFI";
                 ipText.setText(ReceiverSearcher.receiverIP + ":8888");
                 searchIPBtn.setVisibility(View.VISIBLE);
                 showMessage("send notes via WIFI");
@@ -80,6 +86,16 @@ public class MainActivity extends AppCompatActivity {
             searchReceiverIP();
             // Perform action on click
             showMessage("Searching for IP receiver...");
+        });
+        sendNoteBtn.setOnClickListener(v -> {
+            //把最后一个note加进去
+            if(keyPreviousPressed != -1){
+                NoteQueue.addNote(new Note(keyPreviousPressed, (int)(System.currentTimeMillis() - keyPreviousInterval)));
+            }
+//            sendNoteBtn.setEnabled(false);
+            NoteQueue.sendNotes();
+            // Perform action on click
+            showMessage("Sending notes...");
         });
 
         //点击后返回true，避免触发下面的琴键的onTouch事件
@@ -140,6 +156,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void notePressDown(){
+        long currentInterval = System.currentTimeMillis();
+        //不是第一次按，就把前一个按键加进去
+        if(keyPreviousPressed != -1){
+            NoteQueue.addNote(new Note(keyPreviousPressed, (int)(currentInterval - keyPreviousInterval)));
+        }
+        keyPreviousInterval = currentInterval;
+        keyPreviousPressed = keyboard.pressedKey;
         playNoteSound();
         ViewGroup.LayoutParams noteTextParam = noteText.getLayoutParams();
         if(keyboard.isWhiteKey(keyboard.pressedKey))
@@ -153,12 +176,12 @@ public class MainActivity extends AppCompatActivity {
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) noteText.getLayoutParams();
         params.leftMargin = keyboard.getXByKeyIndex();
         noteText.setLayoutParams(params);
-        NoteQueue.addNote(keyboard.pressedKey);
         //是不是用线程来做，否则主UI卡住
 //        IRSender.sendIRNote(this, keyboard.pressedKey);
     }
 
     private void notePressUp(){
+//        Log.d(TAG, "notePressDown: " + System.currentTimeMillis() + ":  " + keyboard.pressedKey);
         ViewAnimator animator = findViewById(R.id.animator);
         AlphaAnimation animation = new AlphaAnimation(1, 0);
         animation.setDuration(1000);
