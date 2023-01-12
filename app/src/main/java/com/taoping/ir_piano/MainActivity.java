@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private PianoKeyboardView keyboard;
     private TextView noteText;
     private TextView ipText;
+    private Button searchIPBtn;
     private TextView noteCoverText;
     private boolean muteSound = false; //手机是否播放音，默认播放
     private AssetManager assetManager; //在MainActivity中初始化
@@ -43,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).hide();
         @SuppressLint("UseSwitchCompatOrMaterialCode") final Switch transmissionSwitch = findViewById(R.id.switchWifiIR);
         @SuppressLint("UseSwitchCompatOrMaterialCode") final Switch muteSwitch = findViewById(R.id.muteSwitch);
-        final Button searchIPBtn = (Button) findViewById(R.id.searchReceiverBtn);
+        searchIPBtn = (Button) findViewById(R.id.searchReceiverBtn);
         keyboard = (PianoKeyboardView) findViewById(R.id.piano_keyboard_view);
         assetManager = getAssets();
         noteText = (TextView) findViewById(R.id.noteText);
@@ -75,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         searchIPBtn.setOnClickListener(v -> {
+            searchIPBtn.setEnabled(false);
             searchReceiverIP();
             // Perform action on click
             showMessage("Searching for IP receiver...");
@@ -133,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
         else
             showMessage("Found a IP receiver " + ip);
         Looper.loop();
+        searchIPBtn.setEnabled(true);
     }
 
     private void notePressDown(){
