@@ -92,6 +92,8 @@ public class MainActivity extends AppCompatActivity {
             if(keyPreviousPressed != -1){
                 NoteQueue.addNote(new Note(keyPreviousPressed, (int)(System.currentTimeMillis() - keyPreviousInterval)));
             }
+            //发送完成之后，要清空前面的键
+            keyPreviousPressed = -1;
 //            sendNoteBtn.setEnabled(false);
             NoteQueue.sendNotes();
             // Perform action on click
