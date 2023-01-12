@@ -129,13 +129,14 @@ public class MainActivity extends AppCompatActivity {
 
     public void setIpText(String ip){
         Looper.prepare();
+//        searchIPBtn.setEnabled(true);
+//        Looper.prepare();
         this.ipText.setText(ip);
         if(ip.startsWith("No"))
             showMessage("No IP receiver found.");
         else
             showMessage("Found a IP receiver " + ip);
         Looper.loop();
-        searchIPBtn.setEnabled(true);
     }
 
     private void notePressDown(){
