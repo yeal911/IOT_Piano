@@ -1,7 +1,8 @@
-package com.taoping.ir_piano;
+package com.taoping.iotpiano;
 
 import android.util.Log;
-import android.widget.TextView;
+
+import com.taoping.notes.NoteQueue;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;

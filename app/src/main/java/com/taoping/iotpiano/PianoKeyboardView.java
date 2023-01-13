@@ -1,20 +1,13 @@
-package com.taoping.ir_piano;
-
-import static android.content.ContentValues.TAG;
+package com.taoping.iotpiano;
 
 import android.content.Context;
-import android.content.res.AssetFileDescriptor;
-import android.content.res.AssetManager;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.media.MediaPlayer;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 

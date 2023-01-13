@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.taoping.ir_piano">
+    package="com.taoping.iotpiano">
 
     <!-- 红外遥控 -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.TRANSMIT_IR" />
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -14,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.IR_Piano">
         <activity
-            android:name=".MainActivity"
+            android:name="com.taoping.iotpiano.MainActivity"
             android:exported="true" android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

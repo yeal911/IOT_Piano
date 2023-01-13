@@ -1,6 +1,4 @@
-package com.taoping.ir_piano;
-
-import static android.content.ContentValues.TAG;
+package com.taoping.iotpiano;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -11,18 +9,19 @@ import android.content.res.AssetManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Looper;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewAnimator;
+
+import com.taoping.notes.Note;
+import com.taoping.notes.NoteQueue;
 
 import java.util.Objects;
 

@@ -1,4 +1,4 @@
-package com.taoping.ir_piano;
+package com.taoping.iotpiano;
 
 import android.content.Context;
 

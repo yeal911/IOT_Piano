@@ -1,4 +1,4 @@
-package com.taoping.ir_piano;
+package com.taoping.notes;
 
 public class Note {
     public int noteIndex; //音符的序号

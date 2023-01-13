@@ -1,4 +1,4 @@
-package com.taoping.ir_piano;
+package com.taoping.notes;
 
 import android.util.Log;
 
@@ -14,14 +14,6 @@ public class NoteQueue {
     public static String sendingChannel = "";
     public static String keyboardToneLevel = "MID"; //存储当前键盘的音区，默认中音区MID。LOW低音区，HIG高音区
     public static int sendingMode = 1; //1: 录制完成一次性发送；2：挨个同时发送
-
-//    //从队首返回一个音符
-//    public static Note popNote(){
-//        if(!noteQueue.isEmpty()){
-//            return (Note)noteQueue.poll();
-//        }
-//        return null;
-//    }
 
     //添加一个音符
     public static void addNote(Note note){

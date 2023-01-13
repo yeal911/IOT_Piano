@@ -148,7 +148,7 @@
         android:layout_margin="5dp"
         android:layout_height="wrap_content">
 
-        <com.taoping.ir_piano.PianoKeyboardView
+        <com.taoping.iotpiano.PianoKeyboardView
             android:id="@+id/piano_keyboard_view"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
