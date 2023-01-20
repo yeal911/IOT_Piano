@@ -41,7 +41,7 @@ public class ReceiverSearcher {
                     socket.close();
                     System.out.println("Response ip: " + receiverIP);
                     NoteQueue.receiverIP = receiverIP;
-                    NoteQueue.startSendingNote("WIFI");
+                    NoteQueue.setSendingMode("WIFI");
                     mainActivity.setIpText(receiverIP + ":8888");
                 } catch (Exception e) {
                     if(e instanceof SocketTimeoutException){

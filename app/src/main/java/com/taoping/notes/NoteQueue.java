@@ -2,10 +2,13 @@ package com.taoping.notes;
 
 import android.util.Log;
 
+import com.taoping.iotpiano.IRSender;
+
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.ArrayDeque;
+import java.util.Objects;
 
 public class NoteQueue {
     public static final ArrayDeque<Note> noteQueue = new ArrayDeque<Note>();
@@ -35,7 +38,7 @@ public class NoteQueue {
                         int port = 8888;
                         while(NoteQueue.sendStatus){
                             // 要发送的字符串
-                            int noteName = noteQueue.poll().noteIndex;
+                            int noteName = Objects.requireNonNull(noteQueue.poll()).noteIndex;
                             if(noteName == -1)
                                 continue;
                             String message;
@@ -55,7 +58,15 @@ public class NoteQueue {
                         // 关闭套接字
                         socket.close();
                     }else{ //通过IR发送
-
+                        while(NoteQueue.sendStatus){
+                            // 要发送的字符串
+                            int noteIndex = Objects.requireNonNull(noteQueue.poll()).noteIndex;
+                            if(noteIndex == -1) {
+                                Thread.sleep(50);
+                                continue;
+                            }
+                            IRSender.sendIRNote(noteIndex);
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -64,7 +75,7 @@ public class NoteQueue {
         }).start();
     }
 
-    //播放note，每按一个键，就实时发送
+    //弹奏后，把所有的notes一次性发送出去播放
     public static void sendNotes(){
         new Thread(new Runnable() {
             @Override
@@ -112,8 +123,8 @@ public class NoteQueue {
         }).start();
     }
 
-    public static void startSendingNote(String sendingMode){
-        sendingChannel = "WIFI";
+    public static void setSendingMode(String sendingMode){
+        sendingChannel = sendingMode;
         sendStatus = true;
         //如果是播放note
         if(NoteQueue.sendingMode == 2) {

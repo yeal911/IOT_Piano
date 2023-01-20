@@ -4,8 +4,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
+import android.hardware.ConsumerIrManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Looper;
@@ -20,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewAnimator;
 
+import com.taoping.ir_piano.R;
 import com.taoping.notes.Note;
 import com.taoping.notes.NoteQueue;
 
@@ -133,6 +136,9 @@ public class MainActivity extends AppCompatActivity {
 //                    Log.d("radiobutton", "HIG");
                 }
             }});
+
+        //初始化红外设备
+        IRSender.mCIR= (ConsumerIrManager) getSystemService(Context.CONSUMER_IR_SERVICE);
     }
 
     //局域网内广播消息，查找服务器
