@@ -22,9 +22,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewAnimator;
 
-import com.taoping.ir_piano.R;
 import com.taoping.notes.Note;
 import com.taoping.notes.NoteQueue;
+import com.taoping.record.VoiceAnalyzer;
 
 import java.util.Objects;
 
@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         transmissionSwitch.setOnClickListener(view -> {
             if(transmissionSwitch.isChecked()){
                 transmissionSwitch.setText("   IR");
-                NoteQueue.sendingChannel = "IR";
+                NoteQueue.setSendingMode("IR");
                 ipText.setText("IR Sensor");
                 searchIPBtn.setVisibility(View.INVISIBLE);
                 showMessage("send notes via IR");
@@ -84,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         searchIPBtn.setOnClickListener(v -> {
+//            VoiceAnalyzer.recordAndDetect(this);
             searchIPBtn.setEnabled(false);
             searchReceiverIP();
             // Perform action on click

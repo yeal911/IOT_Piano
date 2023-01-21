@@ -59,13 +59,17 @@ public class NoteQueue {
                         socket.close();
                     }else{ //通过IR发送
                         while(NoteQueue.sendStatus){
-                            // 要发送的字符串
-                            int noteIndex = Objects.requireNonNull(noteQueue.poll()).noteIndex;
-                            if(noteIndex == -1) {
-                                Thread.sleep(50);
-                                continue;
+                            while(!noteQueue.isEmpty()) {
+                                // 要发送的字符串
+                                int noteIndex = Objects.requireNonNull(noteQueue.poll()).noteIndex;
+                                if (noteIndex == -1) {
+                                    Thread.sleep(50);
+                                    continue;
+                                }
+                                IRSender.sendIRNote(noteIndex);
+                                Log.d("NoteQueue", "sending via IR: " + noteIndex);
                             }
-                            IRSender.sendIRNote(noteIndex);
+                            Thread.sleep(50);
                         }
                     }
                 } catch (Exception e) {
@@ -126,8 +130,9 @@ public class NoteQueue {
     public static void setSendingMode(String sendingMode){
         sendingChannel = sendingMode;
         sendStatus = true;
-        //如果是播放note
-        if(NoteQueue.sendingMode == 2) {
+        //如果是播放note, 挨个同时发送
+        if(sendingMode.equals("IR")) {
+            NoteQueue.sendingMode = 2;
             NoteQueue.noteQueue.clear();
             playNote();
         }
