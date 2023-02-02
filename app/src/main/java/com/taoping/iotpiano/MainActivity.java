@@ -3,6 +3,7 @@ package com.taoping.iotpiano;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
@@ -10,7 +11,9 @@ import android.content.res.AssetManager;
 import android.hardware.ConsumerIrManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Looper;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,11 +25,25 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewAnimator;
 
-import com.taoping.ir_piano.R;
 import com.taoping.notes.Note;
 import com.taoping.notes.NoteQueue;
+import com.taoping.tool.PermissionManager;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.RandomAccessFile;
+import java.nio.ByteOrder;
 import java.util.Objects;
+
+import be.tarsos.dsp.AudioDispatcher;
+import be.tarsos.dsp.AudioEvent;
+import be.tarsos.dsp.AudioProcessor;
+import be.tarsos.dsp.io.TarsosDSPAudioFormat;
+import be.tarsos.dsp.io.android.AudioDispatcherFactory;
+import be.tarsos.dsp.pitch.PitchDetectionHandler;
+import be.tarsos.dsp.pitch.PitchDetectionResult;
+import be.tarsos.dsp.pitch.PitchProcessor;
+import be.tarsos.dsp.writer.WriterProcessor;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,6 +57,9 @@ public class MainActivity extends AppCompatActivity {
     private AssetManager assetManager; //在MainActivity中初始化
     private long keyPreviousInterval; //上一个键被按下的时间，单位毫秒
     private int keyPreviousPressed = -1;
+
+    //录音dispatcher
+    private AudioDispatcher dispatcher;
 
     @SuppressLint({"ClickableViewAccessibility", "SetTextI18n"})
     @Override
@@ -84,8 +104,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         searchIPBtn.setOnClickListener(v -> {
-            searchIPBtn.setEnabled(false);
-            searchReceiverIP();
+            recordAndAnalyze();
+//            searchIPBtn.setEnabled(false);
+//            searchReceiverIP();
             // Perform action on click
             showMessage("Searching for IP receiver...");
         });
@@ -240,4 +261,102 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+    //录音识别note
+    private void recordAndAnalyze() {
+        if (!PermissionManager.RequestPermissions(this, android.Manifest.permission.RECORD_AUDIO))
+            return;
+        if (!PermissionManager.RequestPermissions(this, Manifest.permission.READ_EXTERNAL_STORAGE))
+            return;
+        if (!PermissionManager.RequestPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE))
+            return;
+//        dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050,1024,0);
+//        TarsosDSPAudioFormat tarsosDSPAudioFormat = new TarsosDSPAudioFormat(TarsosDSPAudioFormat.Encoding.PCM_SIGNED, 22050, 2 * 8, 1, 2 * 1, 22050, ByteOrder.BIG_ENDIAN.equals(ByteOrder.nativeOrder()));
+//
+//        String filename = "recorded_sound.wav";
+//        File sdCard = Environment.getExternalStorageDirectory();
+//        File file = new File(sdCard, filename);
+//        RandomAccessFile randomAccessFile = null;
+//        try {
+//            randomAccessFile = new RandomAccessFile(file,"rw");
+//        } catch (FileNotFoundException e) {
+//            throw new RuntimeException(e);
+//        }
+//        AudioProcessor recordProcessor = new WriterProcessor(tarsosDSPAudioFormat, randomAccessFile);
+//        dispatcher.addAudioProcessor(recordProcessor);
+//        PitchDetectionHandler pitchDetectionHandler = (res, e) -> {
+//            final float pitchInHz = res.getPitch();
+//            runOnUiThread(() -> ipText.setText(pitchInHz + ""));
+//        };
+//        AudioProcessor pitchProcessor = new PitchProcessor(PitchProcessor.PitchEstimationAlgorithm.FFT_YIN, 22050, 1024, pitchDetectionHandler);
+//        dispatcher.addAudioProcessor(pitchProcessor);
+//        Thread audioThread = new Thread(dispatcher, "Audio Thread");
+//        audioThread.start();
+        dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050,1024,0);
+        PitchDetectionHandler pdh = new PitchDetectionHandler() {
+            @Override
+            public void handlePitch(PitchDetectionResult res, AudioEvent e){
+                final float pitchInHz = res.getPitch();
+                Log.d("PitchDetect", "handlePitch: " + pitchInHz);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        processPitch(pitchInHz);
+                    }
+                });
+            }
+        };
+        AudioProcessor pitchProcessor = new PitchProcessor(PitchProcessor.PitchEstimationAlgorithm.FFT_YIN, 22050, 1024, pdh);
+        dispatcher.addAudioProcessor(pitchProcessor);
+
+        Thread audioThread = new Thread(dispatcher, "Audio Thread");
+        audioThread.start();
+    }
+
+    //停止录制
+    private void stopRecording(){
+        if(dispatcher != null){
+            if(!dispatcher.isStopped())
+                dispatcher.stop();
+            dispatcher = null;
+        }
+    }
+
+    public void processPitch(float pitchInHz) {
+        String note = "";
+
+        ipText.setText("" + pitchInHz);
+
+        if(pitchInHz >= 110 && pitchInHz < 123.47) {
+            //A
+            note = "A";
+        }
+        else if(pitchInHz >= 123.47 && pitchInHz < 130.81) {
+            //B
+            note = "B";
+        }
+        else if(pitchInHz >= 130.81 && pitchInHz < 146.83) {
+            //C
+            note = "C";
+        }
+        else if(pitchInHz >= 146.83 && pitchInHz < 164.81) {
+            //D
+            note = "D";
+        }
+        else if(pitchInHz >= 164.81 && pitchInHz <= 174.61) {
+            //E
+            note = "E";
+        }
+        else if(pitchInHz >= 174.61 && pitchInHz < 185) {
+            //F
+            note = "F";
+        }
+        else if(pitchInHz >= 185 && pitchInHz < 196) {
+            //G
+            note = "G";
+        }
+
+        Log.d("PitchDetect", "frequency: " + pitchInHz + "; note: " + note);
+    }
+
 }
