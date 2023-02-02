@@ -27,6 +27,7 @@ import android.widget.ViewAnimator;
 
 import com.taoping.notes.Note;
 import com.taoping.notes.NoteQueue;
+import com.taoping.tool.NoteFrequencyTool;
 import com.taoping.tool.PermissionManager;
 
 import java.io.File;
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     private AssetManager assetManager; //在MainActivity中初始化
     private long keyPreviousInterval; //上一个键被按下的时间，单位毫秒
     private int keyPreviousPressed = -1;
+    public static String keyboardToneLevel = "MID"; //存储当前键盘的音区，默认中音区MID。LOW低音区，HIG高音区
 
     //录音dispatcher
     private AudioDispatcher dispatcher;
@@ -113,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
         sendNoteBtn.setOnClickListener(v -> {
             //把最后一个note加进去
             if(keyPreviousPressed != -1){
-                NoteQueue.addNote(new Note(keyPreviousPressed, (int)(System.currentTimeMillis() - keyPreviousInterval)));
+                NoteQueue.addNote(new Note(MainActivity.keyboardToneLevel, keyPreviousPressed, (int)(System.currentTimeMillis() - keyPreviousInterval)));
             }
             //发送完成之后，要清空前面的键
             keyPreviousPressed = -1;
@@ -141,17 +143,17 @@ public class MainActivity extends AppCompatActivity {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                  // checkedId is the RadioButton selected
                 if(checkedId == R.id.lowToneRadioButton){
-                    NoteQueue.keyboardToneLevel = "LOW";
+                    MainActivity.keyboardToneLevel = "LOW";
                     coverUnreachableKeys();
                     showMessage("low tone keyboard.");
 //                    Log.d("radiobutton", "LOW");
                 }else if(checkedId == R.id.midToneRadioButton){
-                    NoteQueue.keyboardToneLevel = "MID";
+                    MainActivity.keyboardToneLevel = "MID";
                     coverUnreachableKeys();
                     showMessage("middle tone keyboard.");
 //                    Log.d("radiobutton", "MID");
                 }else{
-                    NoteQueue.keyboardToneLevel = "HIG";
+                    MainActivity.keyboardToneLevel = "HIG";
                     coverUnreachableKeys();
                     showMessage("high tone keyboard.");
 //                    Log.d("radiobutton", "HIG");
@@ -187,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
         long currentInterval = System.currentTimeMillis();
         //不是第一次按，就把前一个按键加进去
         if(keyPreviousPressed != -1){
-            NoteQueue.addNote(new Note(keyPreviousPressed, (int)(currentInterval - keyPreviousInterval)));
+            NoteQueue.addNote(new Note(MainActivity.keyboardToneLevel, keyPreviousPressed, (int)(currentInterval - keyPreviousInterval)));
         }
         keyPreviousInterval = currentInterval;
         keyPreviousPressed = keyboard.pressedKey;
@@ -229,11 +231,11 @@ public class MainActivity extends AppCompatActivity {
                 keyboard.getHeight());
         params.leftToLeft = ConstraintLayout.LayoutParams.UNSET;
         params.rightToRight = ConstraintLayout.LayoutParams.UNSET;
-        if(NoteQueue.keyboardToneLevel.equals("LOW")){
+        if(MainActivity.keyboardToneLevel.equals("LOW")){
             noteCoverText.setVisibility(View.VISIBLE);
             params.leftToLeft = R.id.piano_keyboard_view;
             noteCoverText.setLayoutParams(params);
-        }else if(NoteQueue.keyboardToneLevel.equals("HIG")){
+        }else if(MainActivity.keyboardToneLevel.equals("HIG")){
             noteCoverText.setVisibility(View.VISIBLE);
             params.width = (keyboard.WHITE_KEY_WIDTH + 10) * 6 + 10;
             params.rightToRight = R.id.piano_keyboard_view;
@@ -246,11 +248,11 @@ public class MainActivity extends AppCompatActivity {
 
     //播放对应的音
     private void playNoteSound() {
-//        Log.d(TAG, "playNoteSound: " + NoteQueue.keyboardToneLevel + ", " + keyboard.pressedKey + "; " + keyboard.note2Mp3File.get(NoteQueue.keyboardToneLevel+keyboard.pressedKey));
+//        Log.d(TAG, "playNoteSound: " + MainActivity.keyboardToneLevel + ", " + keyboard.pressedKey + "; " + keyboard.note2Mp3File.get(MainActivity.keyboardToneLevel+keyboard.pressedKey));
         if(!muteSound){
             try {
-                AssetFileDescriptor afd = assetManager.openFd(keyboard.note2Mp3File.get(NoteQueue.keyboardToneLevel+keyboard.pressedKey));
-//                Log.d(TAG, "playNoteSound: " + keyboard.note2Mp3File.get(NoteQueue.keyboardToneLevel+keyboard.pressedKey));
+                AssetFileDescriptor afd = assetManager.openFd(keyboard.note2Mp3File.get(MainActivity.keyboardToneLevel+keyboard.pressedKey));
+//                Log.d(TAG, "playNoteSound: " + keyboard.note2Mp3File.get(MainActivity.keyboardToneLevel+keyboard.pressedKey));
                 MediaPlayer mediaPlayer = new MediaPlayer();
                 mediaPlayer.reset();
                 mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
@@ -270,28 +272,6 @@ public class MainActivity extends AppCompatActivity {
             return;
         if (!PermissionManager.RequestPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE))
             return;
-//        dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050,1024,0);
-//        TarsosDSPAudioFormat tarsosDSPAudioFormat = new TarsosDSPAudioFormat(TarsosDSPAudioFormat.Encoding.PCM_SIGNED, 22050, 2 * 8, 1, 2 * 1, 22050, ByteOrder.BIG_ENDIAN.equals(ByteOrder.nativeOrder()));
-//
-//        String filename = "recorded_sound.wav";
-//        File sdCard = Environment.getExternalStorageDirectory();
-//        File file = new File(sdCard, filename);
-//        RandomAccessFile randomAccessFile = null;
-//        try {
-//            randomAccessFile = new RandomAccessFile(file,"rw");
-//        } catch (FileNotFoundException e) {
-//            throw new RuntimeException(e);
-//        }
-//        AudioProcessor recordProcessor = new WriterProcessor(tarsosDSPAudioFormat, randomAccessFile);
-//        dispatcher.addAudioProcessor(recordProcessor);
-//        PitchDetectionHandler pitchDetectionHandler = (res, e) -> {
-//            final float pitchInHz = res.getPitch();
-//            runOnUiThread(() -> ipText.setText(pitchInHz + ""));
-//        };
-//        AudioProcessor pitchProcessor = new PitchProcessor(PitchProcessor.PitchEstimationAlgorithm.FFT_YIN, 22050, 1024, pitchDetectionHandler);
-//        dispatcher.addAudioProcessor(pitchProcessor);
-//        Thread audioThread = new Thread(dispatcher, "Audio Thread");
-//        audioThread.start();
         dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050,1024,0);
         PitchDetectionHandler pdh = new PitchDetectionHandler() {
             @Override
@@ -323,40 +303,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void processPitch(float pitchInHz) {
-        String note = "";
-
-        ipText.setText("" + pitchInHz);
-
-        if(pitchInHz >= 110 && pitchInHz < 123.47) {
-            //A
-            note = "A";
-        }
-        else if(pitchInHz >= 123.47 && pitchInHz < 130.81) {
-            //B
-            note = "B";
-        }
-        else if(pitchInHz >= 130.81 && pitchInHz < 146.83) {
-            //C
-            note = "C";
-        }
-        else if(pitchInHz >= 146.83 && pitchInHz < 164.81) {
-            //D
-            note = "D";
-        }
-        else if(pitchInHz >= 164.81 && pitchInHz <= 174.61) {
-            //E
-            note = "E";
-        }
-        else if(pitchInHz >= 174.61 && pitchInHz < 185) {
-            //F
-            note = "F";
-        }
-        else if(pitchInHz >= 185 && pitchInHz < 196) {
-            //G
-            note = "G";
-        }
-
-        Log.d("PitchDetect", "frequency: " + pitchInHz + "; note: " + note);
+        if(pitchInHz == -1.0f)
+            return;
+        String noteName = NoteFrequencyTool.getNoteByFrequency(pitchInHz);
+        if(noteName != null)
+            ipText.setText(noteName);
+        Log.d("PitchDetect", "frequency: " + pitchInHz + "; note: " + noteName);
     }
 
 }

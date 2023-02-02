@@ -3,6 +3,7 @@ package com.taoping.notes;
 import android.util.Log;
 
 import com.taoping.iotpiano.IRSender;
+import com.taoping.iotpiano.MainActivity;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -15,7 +16,6 @@ public class NoteQueue {
     public static boolean sendStatus = true;
     public static String receiverIP = null;
     public static String sendingChannel = "";
-    public static String keyboardToneLevel = "MID"; //存储当前键盘的音区，默认中音区MID。LOW低音区，HIG高音区
     public static int sendingMode = 1; //1: 录制完成一次性发送；2：挨个同时发送
 
     //添加一个音符
@@ -44,9 +44,9 @@ public class NoteQueue {
                             String message;
                             //小于10的前面补0，保持消息长度一致
                             if(noteName >= 10)
-                                message = keyboardToneLevel + noteName;
+                                message = MainActivity.keyboardToneLevel + noteName;
                             else
-                                message = keyboardToneLevel + "0" + noteName;
+                                message = MainActivity.keyboardToneLevel + "0" + noteName;
                             Log.d("NoteQueue", "sending " + message);
                             // 将字符串转换为字节数组
                             byte[] data = message.getBytes();
@@ -89,16 +89,18 @@ public class NoteQueue {
                         while(!NoteQueue.noteQueue.isEmpty()){
                             // 要发送的字符串
                             Note note = noteQueue.poll();
-                            //小于10的前面补0，保持消息长度一致
-                            if(note.noteIndex >= 10)
-                                message.append(keyboardToneLevel + note.noteIndex);
-                            else
-                                message.append(keyboardToneLevel + "0" + note.noteIndex);
-                            //最大支持10s，因为超过10s位数就不同了，所以最大9999
-                            if(note.interval > 10000)
-                                message.append("9999");
-                            else
-                                message.append("0000".substring(String.valueOf(note.interval).length()) + note.interval);
+                            message.append(note.noteName);
+                            message.append(note.intervalString);
+//                            //小于10的前面补0，保持消息长度一致
+//                            if(note.noteIndex >= 10)
+//                                message.append(MainActivity.keyboardToneLevel + note.noteIndex);
+//                            else
+//                                message.append(MainActivity.keyboardToneLevel + "0" + note.noteIndex);
+//                            //最大支持10s，因为超过10s位数就不同了，所以最大9999
+//                            if(note.interval > 10000)
+//                                message.append("9999");
+//                            else
+//                                message.append("0000".substring(String.valueOf(note.interval).length()) + note.interval);
                         }
                         Log.d("NoteQueue", "run: " + message);
                         // 创建一个 DatagramSocket 实例
