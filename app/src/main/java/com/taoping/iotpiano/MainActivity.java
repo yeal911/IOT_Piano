@@ -1,8 +1,5 @@
 package com.taoping.iotpiano;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -11,7 +8,6 @@ import android.content.res.AssetManager;
 import android.hardware.ConsumerIrManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Looper;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -25,26 +21,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewAnimator;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+
 import com.taoping.notes.Note;
 import com.taoping.notes.NoteQueue;
 import com.taoping.tool.NoteFrequencyTool;
 import com.taoping.tool.PermissionManager;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.RandomAccessFile;
-import java.nio.ByteOrder;
 import java.util.Objects;
 
 import be.tarsos.dsp.AudioDispatcher;
-import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
-import be.tarsos.dsp.io.TarsosDSPAudioFormat;
 import be.tarsos.dsp.io.android.AudioDispatcherFactory;
 import be.tarsos.dsp.pitch.PitchDetectionHandler;
-import be.tarsos.dsp.pitch.PitchDetectionResult;
 import be.tarsos.dsp.pitch.PitchProcessor;
-import be.tarsos.dsp.writer.WriterProcessor;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -52,8 +43,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView noteText;
     private TextView ipText;
     private Button searchIPBtn;
-    private Button recordBtn;
-    private Button sendNoteBtn;
     private TextView noteCoverText;
     private boolean muteSound = false; //手机是否播放音，默认播放
     private AssetManager assetManager; //在MainActivity中初始化
@@ -72,15 +61,15 @@ public class MainActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).hide();
         @SuppressLint("UseSwitchCompatOrMaterialCode") final Switch transmissionSwitch = findViewById(R.id.switchWifiIR);
         @SuppressLint("UseSwitchCompatOrMaterialCode") final Switch muteSwitch = findViewById(R.id.muteSwitch);
-        searchIPBtn = (Button) findViewById(R.id.searchReceiverBtn);
-        recordBtn = (Button) findViewById(R.id.recordBtn);
-        sendNoteBtn = (Button) findViewById(R.id.sendNoteBtn);
-        keyboard = (PianoKeyboardView) findViewById(R.id.piano_keyboard_view);
+        searchIPBtn = findViewById(R.id.searchReceiverBtn);
+        Button recordBtn = findViewById(R.id.recordBtn);
+        Button sendNoteBtn = findViewById(R.id.sendNoteBtn);
+        keyboard = findViewById(R.id.piano_keyboard_view);
         assetManager = getAssets();
-        noteText = (TextView) findViewById(R.id.noteText);
-        ipText = (TextView) findViewById(R.id.ipText);
-        noteCoverText = (TextView) findViewById(R.id.coverTextView);
-        RadioGroup toneCoverageRadio = (RadioGroup) findViewById(R.id.toneRadioGroup);
+        noteText = findViewById(R.id.noteText);
+        ipText = findViewById(R.id.ipText);
+        noteCoverText = findViewById(R.id.coverTextView);
+        RadioGroup toneCoverageRadio = findViewById(R.id.toneRadioGroup);
         transmissionSwitch.setOnClickListener(view -> {
             if(transmissionSwitch.isChecked()){
                 transmissionSwitch.setText("   IR");
@@ -100,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
             if(muteSwitch.isChecked()){
                 muteSwitch.setText("播放");
                 muteSound = false;
-                showMessage("Unmuted.");
+                showMessage("Vocal.");
             }else{
                 muteSwitch.setText("静音");
                 muteSound = true;
@@ -114,7 +103,13 @@ public class MainActivity extends AppCompatActivity {
             showMessage("Searching for IP receiver...");
         });
         recordBtn.setOnClickListener(v -> {
-            recordAndAnalyze();
+            if(recordBtn.getText().equals("识别")){
+                recordAndAnalyze();
+                recordBtn.setText("停止");
+            }else {
+                stopRecording();
+                recordBtn.setText("识别");
+            }
             // Perform action on click
             showMessage("Listening melody...");
         });
@@ -132,9 +127,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //点击后返回true，避免触发下面的琴键的onTouch事件
-        noteCoverText.setOnTouchListener((view, motionEvent) -> {
-            return true;
-        });
+        noteCoverText.setOnTouchListener((view, motionEvent) -> true);
         keyboard.setOnTouchListener((view, motionEvent) -> {
             keyboard.pianoOnTouch(motionEvent);
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN && keyboard.pressedKey != -1)
@@ -144,27 +137,25 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
-        toneCoverageRadio.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                 // checkedId is the RadioButton selected
-                if(checkedId == R.id.lowToneRadioButton){
-                    MainActivity.keyboardToneLevel = "LOW";
-                    coverUnreachableKeys();
-                    showMessage("low tone keyboard.");
+        toneCoverageRadio.setOnCheckedChangeListener((group, checkedId) -> {
+             // checkedId is the RadioButton selected
+            if(checkedId == R.id.lowToneRadioButton){
+                MainActivity.keyboardToneLevel = "LOW";
+                coverUnreachableKeys();
+                showMessage("low tone keyboard.");
 //                    Log.d("radiobutton", "LOW");
-                }else if(checkedId == R.id.midToneRadioButton){
-                    MainActivity.keyboardToneLevel = "MID";
-                    coverUnreachableKeys();
-                    showMessage("middle tone keyboard.");
+            }else if(checkedId == R.id.midToneRadioButton){
+                MainActivity.keyboardToneLevel = "MID";
+                coverUnreachableKeys();
+                showMessage("middle tone keyboard.");
 //                    Log.d("radiobutton", "MID");
-                }else{
-                    MainActivity.keyboardToneLevel = "HIG";
-                    coverUnreachableKeys();
-                    showMessage("high tone keyboard.");
+            }else{
+                MainActivity.keyboardToneLevel = "HIG";
+                coverUnreachableKeys();
+                showMessage("high tone keyboard.");
 //                    Log.d("radiobutton", "HIG");
-                }
-            }});
+            }
+        });
 
         //初始化红外设备
         IRSender.mCIR= (ConsumerIrManager) getSystemService(Context.CONSUMER_IR_SERVICE);
@@ -181,8 +172,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void setIpText(String ip){
         Looper.prepare();
-//        searchIPBtn.setEnabled(true);
-//        Looper.prepare();
         this.ipText.setText(ip);
         if(ip.startsWith("No"))
             showMessage("No IP receiver found.");
@@ -233,7 +222,7 @@ public class MainActivity extends AppCompatActivity {
     //选择低音区或者高音区的时候，将不可用的键隐藏起来
     private void coverUnreachableKeys(){
         ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(
-                (keyboard.WHITE_KEY_WIDTH + 10) * 5,
+                (PianoKeyboardView.WHITE_KEY_WIDTH + 10) * 5,
                 keyboard.getHeight());
         params.leftToLeft = ConstraintLayout.LayoutParams.UNSET;
         params.rightToRight = ConstraintLayout.LayoutParams.UNSET;
@@ -243,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
             noteCoverText.setLayoutParams(params);
         }else if(MainActivity.keyboardToneLevel.equals("HIG")){
             noteCoverText.setVisibility(View.VISIBLE);
-            params.width = (keyboard.WHITE_KEY_WIDTH + 10) * 6 + 10;
+            params.width = (PianoKeyboardView.WHITE_KEY_WIDTH + 10) * 6 + 10;
             params.rightToRight = R.id.piano_keyboard_view;
             noteCoverText.setLayoutParams(params);
         }else{
@@ -279,18 +268,10 @@ public class MainActivity extends AppCompatActivity {
         if (!PermissionManager.RequestPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE))
             return;
         dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050,1024,0);
-        PitchDetectionHandler pdh = new PitchDetectionHandler() {
-            @Override
-            public void handlePitch(PitchDetectionResult res, AudioEvent e){
-                final float pitchInHz = res.getPitch();
-                Log.d("PitchDetect", "handlePitch: " + pitchInHz);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        processPitch(pitchInHz);
-                    }
-                });
-            }
+        PitchDetectionHandler pdh = (res, e) -> {
+            final float pitchInHz = res.getPitch();
+            Log.d("PitchDetect", "handlePitch: " + pitchInHz);
+            runOnUiThread(() -> processPitch(pitchInHz));
         };
         AudioProcessor pitchProcessor = new PitchProcessor(PitchProcessor.PitchEstimationAlgorithm.FFT_YIN, 22050, 1024, pdh);
         dispatcher.addAudioProcessor(pitchProcessor);
