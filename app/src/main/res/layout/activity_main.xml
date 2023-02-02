@@ -19,16 +19,27 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            android:paddingEnd="5dp"
             android:background="@drawable/group_background">
+            <Switch
+                android:id="@+id/switchWifiIR"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="Wifi"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="UseSwitchCompatOrMaterialXml,TouchTargetSizeCheck" />
             <TextView
                 android:id="@+id/captionText"
                 android:layout_width="70dp"
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:gravity="center_vertical"
-                android:text="Receiver:"
+                android:text="接收器:"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintLeft_toRightOf="@+id/switchWifiIR"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="TouchTargetSizeCheck" />
             <TextView
@@ -46,24 +57,39 @@
                 tools:ignore="TouchTargetSizeCheck" />
             <Button
                 android:id="@+id/searchReceiverBtn"
-                android:layout_width="70dp"
+                android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:padding="0dp"
                 android:gravity="center"
-                android:text="Search"
+                android:text="搜索"
                 app:layout_constraintLeft_toRightOf="@+id/ipText"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="TouchTargetSizeCheck" />
-            <Switch
-                android:id="@+id/switchWifiIR"
-                android:layout_width="wrap_content"
+            <Button
+                android:id="@+id/recordBtn"
+                android:layout_width="50dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:text="Wifi"
+                android:layout_marginStart="5dp"
+                android:gravity="center"
+                android:padding="0dp"
+                android:text="识别"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toRightOf="@+id/searchReceiverBtn"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:ignore="UseSwitchCompatOrMaterialXml,TouchTargetSizeCheck" />
+                tools:ignore="TouchTargetSizeCheck" />
+            <Button
+                android:id="@+id/sendNoteBtn"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:gravity="center"
+                android:padding="0dp"
+                android:text="发送"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@+id/recordBtn"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="TouchTargetSizeCheck" />
         </androidx.constraintlayout.widget.ConstraintLayout>
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/pianoSetLayout"
@@ -74,25 +100,15 @@
             app:layout_constraintTop_toTopOf="parent"
             android:layout_marginEnd="5dp"
             android:background="@drawable/group_background">
-            <Button
-                android:id="@+id/sendNoteBtn"
-                android:layout_width="50dp"
-                android:padding="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="Send"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
             <Switch
                 android:id="@+id/muteSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:text="Unmuted"
+                android:text="播放"
                 android:checked="true"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toRightOf="@+id/sendNoteBtn"
+                app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="UseSwitchCompatOrMaterialXml" />
             <View
@@ -120,7 +136,7 @@
                     android:id="@+id/lowToneRadioButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Low"
+                    android:text="L"
                     tools:ignore="TouchTargetSizeCheck" />
 
                 <RadioButton
@@ -128,14 +144,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="true"
-                    android:text="Middle"
+                    android:text="M"
                     tools:ignore="TouchTargetSizeCheck" />
 
                 <RadioButton
                     android:id="@+id/highToneRadioButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="High"
+                    android:text="H"
                     tools:ignore="TouchTargetSizeCheck" />
             </RadioGroup>
         </androidx.constraintlayout.widget.ConstraintLayout>

@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView noteText;
     private TextView ipText;
     private Button searchIPBtn;
+    private Button recordBtn;
     private Button sendNoteBtn;
     private TextView noteCoverText;
     private boolean muteSound = false; //手机是否播放音，默认播放
@@ -72,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
         @SuppressLint("UseSwitchCompatOrMaterialCode") final Switch transmissionSwitch = findViewById(R.id.switchWifiIR);
         @SuppressLint("UseSwitchCompatOrMaterialCode") final Switch muteSwitch = findViewById(R.id.muteSwitch);
         searchIPBtn = (Button) findViewById(R.id.searchReceiverBtn);
+        recordBtn = (Button) findViewById(R.id.recordBtn);
         sendNoteBtn = (Button) findViewById(R.id.sendNoteBtn);
         keyboard = (PianoKeyboardView) findViewById(R.id.piano_keyboard_view);
         assetManager = getAssets();
@@ -96,21 +98,25 @@ public class MainActivity extends AppCompatActivity {
         });
         muteSwitch.setOnClickListener(view -> {
             if(muteSwitch.isChecked()){
-                muteSwitch.setText("Unmuted");
+                muteSwitch.setText("播放");
                 muteSound = false;
                 showMessage("Unmuted.");
             }else{
-                muteSwitch.setText("Muted");
+                muteSwitch.setText("静音");
                 muteSound = true;
                 showMessage("Muted.");
             }
         });
         searchIPBtn.setOnClickListener(v -> {
-            recordAndAnalyze();
-//            searchIPBtn.setEnabled(false);
-//            searchReceiverIP();
+            searchIPBtn.setEnabled(false);
+            searchReceiverIP();
             // Perform action on click
             showMessage("Searching for IP receiver...");
+        });
+        recordBtn.setOnClickListener(v -> {
+            recordAndAnalyze();
+            // Perform action on click
+            showMessage("Listening melody...");
         });
         sendNoteBtn.setOnClickListener(v -> {
             //把最后一个note加进去
