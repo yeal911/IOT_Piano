@@ -1,5 +1,9 @@
 package com.taoping.notes;
 
+import android.annotation.SuppressLint;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,6 +13,8 @@ public class Note {
 
     public String noteName; //音名
     public String intervalString;
+
+    public String addTime;
 
     private static final Map<String, String> indexToNote = new HashMap<>();
 
@@ -123,7 +129,9 @@ public class Note {
         indexToNote.put("HIG35", "B09");
     }
 
+    @SuppressLint("SimpleDateFormat")
     public Note(String keyLevel, int noteIndex, int interval) {
+        this.addTime = new SimpleDateFormat("hh:mm:ss:SSS").format(new Date());
         this.noteIndex = noteIndex;
         this.interval = interval;
         if (interval > 10000)
@@ -133,7 +141,9 @@ public class Note {
         this.noteName = indexToNote.get(keyLevel + noteIndex);
     }
 
+    @SuppressLint("SimpleDateFormat")
     public Note(String noteName, int interval) {
+        this.addTime = new SimpleDateFormat("hh:mm:ss:SSS").format(new Date());
         this.noteName = noteName;
         this.interval = interval;
         if (interval > 10000)

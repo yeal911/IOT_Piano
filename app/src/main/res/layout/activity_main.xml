@@ -78,6 +78,18 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="TouchTargetSizeCheck" />
             <Button
+                android:id="@+id/playMelodyBtn"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:gravity="center"
+                android:padding="0dp"
+                android:text="播放"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@+id/recordBtn"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="TouchTargetSizeCheck" />
+            <Button
                 android:id="@+id/sendNoteBtn"
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
@@ -87,7 +99,7 @@
                 android:padding="0dp"
                 android:text="发送"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toRightOf="@+id/recordBtn"
+                app:layout_constraintLeft_toRightOf="@+id/playMelodyBtn"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="TouchTargetSizeCheck" />
         </androidx.constraintlayout.widget.ConstraintLayout>

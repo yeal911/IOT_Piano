@@ -29,6 +29,8 @@ import com.taoping.notes.NoteQueue;
 import com.taoping.tool.NoteFrequencyTool;
 import com.taoping.tool.PermissionManager;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Objects;
 
 import be.tarsos.dsp.AudioDispatcher;
@@ -43,13 +45,13 @@ public class MainActivity extends AppCompatActivity {
     private TextView noteText;
     private TextView ipText;
     private Button searchIPBtn;
+    private Button playMelodyBtn;
     private TextView noteCoverText;
     private boolean muteSound = false; //手机是否播放音，默认播放
     private AssetManager assetManager; //在MainActivity中初始化
     private long keyPreviousInterval; //上一个键被按下的时间，单位毫秒
     private int keyPreviousPressed = -1;
     public static String keyboardToneLevel = "MID"; //存储当前键盘的音区，默认中音区MID。LOW低音区，HIG高音区
-
     //录音dispatcher
     private AudioDispatcher dispatcher;
     private long recordPreviousInterval; //录音情况下上一个音符的时间，单位毫秒
@@ -67,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
         @SuppressLint("UseSwitchCompatOrMaterialCode") final Switch muteSwitch = findViewById(R.id.muteSwitch);
         searchIPBtn = findViewById(R.id.searchReceiverBtn);
         Button recordBtn = findViewById(R.id.recordBtn);
+        playMelodyBtn = findViewById(R.id.playMelodyBtn);
         Button sendNoteBtn = findViewById(R.id.sendNoteBtn);
         keyboard = findViewById(R.id.piano_keyboard_view);
         assetManager = getAssets();
@@ -108,14 +111,19 @@ public class MainActivity extends AppCompatActivity {
         });
         recordBtn.setOnClickListener(v -> {
             if(recordBtn.getText().equals("识别")){
+                showMessage("Listening melody...");
+                NoteQueue.recordQueue.clear();
                 recordAndAnalyze();
                 recordBtn.setText("停止");
             }else {
+                showMessage("Stopped listening melody...");
                 stopRecording();
                 recordBtn.setText("识别");
             }
-            // Perform action on click
-            showMessage("Listening melody...");
+        });
+        playMelodyBtn.setOnClickListener(v -> {
+            repeatMelody();
+            showMessage("repeating melody...");
         });
         sendNoteBtn.setOnClickListener(v -> {
             //把最后一个note加进去
@@ -271,6 +279,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         if (!PermissionManager.RequestPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE))
             return;
+        NoteQueue.noteQueue.clear();
         dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050,1024,0);
         PitchDetectionHandler pdh = (res, e) -> {
             final float pitchInHz = res.getPitch();
@@ -290,13 +299,14 @@ public class MainActivity extends AppCompatActivity {
         recordNoteCount = 0;
         //加入最后一个note
         if(!recordPreviousNote.equals(""))
-            NoteQueue.addNote(new Note(recordPreviousNote, (int)(System.currentTimeMillis() - recordPreviousInterval)));
+            NoteQueue.addRecordNote(new Note(recordPreviousNote, (int)(System.currentTimeMillis() - recordPreviousInterval)));
         if(dispatcher != null){
             if(!dispatcher.isStopped())
                 dispatcher.stop();
             dispatcher = null;
         }
-        showMessage("Total " + NoteQueue.noteQueue.size() + " notes recognized!");
+        showMessage("Total " + NoteQueue.recordQueue.size() + " notes recognized!");
+//        Log.d("check pitch - noteQueue", "stopRecording: \n" + NoteQueue.allRecordNotes());
     }
 
     public void processPitch(float pitchInHz) {
@@ -313,7 +323,10 @@ public class MainActivity extends AppCompatActivity {
             //如果note跟前一个一样且是有效的，那么当成同一个
             assert noteName != null;
             if(!noteName.equals(recordPreviousNote) && isRecordPreviousNoteValid) {
-                NoteQueue.addNote(new Note(recordPreviousNote, (int) (currentInterval - recordPreviousInterval)));
+//                String time = new SimpleDateFormat("hh:mm:ss:SSS").format(new Date());
+                NoteQueue.addRecordNote(new Note(recordPreviousNote, (int) (currentInterval - recordPreviousInterval)));
+//                Log.d("check pitch - step",  time + ": " + recordPreviousNote + ", " + (int) (currentInterval - recordPreviousInterval));
+//                Log.d("check pitch - noteQueue", ": \n" + NoteQueue.allRecordNotes());
                 recordPreviousInterval = currentInterval;
                 recordPreviousNote = noteName;
             }
@@ -324,6 +337,28 @@ public class MainActivity extends AppCompatActivity {
         //识别音符加1
         recordNoteCount++;
         isRecordPreviousNoteValid = true;
+    }
+
+    //识别的旋律和节奏，用钢琴音播放出来
+    private void repeatMelody() {
+        try {
+            playMelodyBtn.setEnabled(false);
+            while(!NoteQueue.recordQueue.isEmpty()){
+                Note note = NoteQueue.recordQueue.poll();
+                assert note != null;
+                AssetFileDescriptor afd = assetManager.openFd(note.noteName + ".mp3");
+    //                Log.d(TAG, "playNoteSound: " + keyboard.note2Mp3File.get(MainActivity.keyboardToneLevel+keyboard.pressedKey));
+                MediaPlayer mediaPlayer = new MediaPlayer();
+                mediaPlayer.reset();
+                mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+                mediaPlayer.prepare();
+                mediaPlayer.start();
+                Thread.sleep(note.interval);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        playMelodyBtn.setEnabled(true);
     }
 
 }

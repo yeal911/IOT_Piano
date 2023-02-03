@@ -2,6 +2,8 @@ package com.taoping.notes;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.taoping.iotpiano.IRSender;
 import com.taoping.iotpiano.MainActivity;
 
@@ -13,6 +15,7 @@ import java.util.Objects;
 
 public class NoteQueue {
     public static final ArrayDeque<Note> noteQueue = new ArrayDeque<Note>();
+    public static final ArrayDeque<Note> recordQueue = new ArrayDeque<Note>();
     public static boolean sendStatus = true;
     public static String receiverIP = null;
     public static String sendingChannel = "WIFI";
@@ -21,6 +24,11 @@ public class NoteQueue {
     //添加一个音符
     public static void addNote(Note note){
         noteQueue.add(note);
+    }
+
+    //录音识别状态下添加
+    public static void addRecordNote(Note note){
+        recordQueue.add(note);
     }
 
     //播放note，每按一个键，就实时发送
@@ -129,4 +137,18 @@ public class NoteQueue {
         sendStatus = false;
     }
 
+    public static String allRecordNotes() {
+        ArrayDeque<Note> tmp = recordQueue.clone();
+        StringBuilder res = new StringBuilder();
+        while(!tmp.isEmpty()){
+            Note noteTmp = tmp.poll();
+            res.append(noteTmp.addTime);
+            res.append(": ");
+            res.append(noteTmp.noteName);
+            res.append(", ");
+            res.append(noteTmp.interval);
+            res.append("\n");
+        }
+        return res.toString();
+    }
 }
