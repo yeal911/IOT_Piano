@@ -5,7 +5,6 @@ public class NoteFrequencyRange {
     public float noteFrequencyStart;
     public float noteFrequencyEnd;
     public String noteName;
-
     public NoteFrequencyRange(float start, float end, String name){
         this.noteFrequencyStart = start;
         this.noteFrequencyEnd = end;

@@ -15,7 +15,7 @@ public class NoteQueue {
     public static final ArrayDeque<Note> noteQueue = new ArrayDeque<Note>();
     public static boolean sendStatus = true;
     public static String receiverIP = null;
-    public static String sendingChannel = "";
+    public static String sendingChannel = "WIFI";
     public static int sendingMode = 1; //1: 录制完成一次性发送；2：挨个同时发送
 
     //添加一个音符
@@ -86,21 +86,11 @@ public class NoteQueue {
                         if(noteQueue.isEmpty())
                             return;
                         StringBuilder message = new StringBuilder();
-                        while(!NoteQueue.noteQueue.isEmpty()){
+                        while(!noteQueue.isEmpty()){
                             // 要发送的字符串
                             Note note = noteQueue.poll();
                             message.append(note.noteName);
                             message.append(note.intervalString);
-//                            //小于10的前面补0，保持消息长度一致
-//                            if(note.noteIndex >= 10)
-//                                message.append(MainActivity.keyboardToneLevel + note.noteIndex);
-//                            else
-//                                message.append(MainActivity.keyboardToneLevel + "0" + note.noteIndex);
-//                            //最大支持10s，因为超过10s位数就不同了，所以最大9999
-//                            if(note.interval > 10000)
-//                                message.append("9999");
-//                            else
-//                                message.append("0000".substring(String.valueOf(note.interval).length()) + note.interval);
                         }
                         Log.d("NoteQueue", "run: " + message);
                         // 创建一个 DatagramSocket 实例

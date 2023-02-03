@@ -52,6 +52,10 @@ public class MainActivity extends AppCompatActivity {
 
     //录音dispatcher
     private AudioDispatcher dispatcher;
+    private long recordPreviousInterval; //录音情况下上一个音符的时间，单位毫秒
+    private int recordNoteCount; //记录共识别录制了多少音符
+    private String recordPreviousNote; //上一个识别的音符
+    private boolean isRecordPreviousNoteValid; //上一个是否是有效的note
 
     @SuppressLint({"ClickableViewAccessibility", "SetTextI18n"})
     @Override
@@ -181,13 +185,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void notePressDown(){
+        keyPreviousPressed = keyboard.pressedKey;
         long currentInterval = System.currentTimeMillis();
         //不是第一次按，就把前一个按键加进去
         if(keyPreviousPressed != -1){
             NoteQueue.addNote(new Note(MainActivity.keyboardToneLevel, keyPreviousPressed, (int)(currentInterval - keyPreviousInterval)));
         }
         keyPreviousInterval = currentInterval;
-        keyPreviousPressed = keyboard.pressedKey;
         playNoteSound();
         ViewGroup.LayoutParams noteTextParam = noteText.getLayoutParams();
         if(keyboard.isWhiteKey(keyboard.pressedKey))
@@ -282,20 +286,44 @@ public class MainActivity extends AppCompatActivity {
 
     //停止录制
     private void stopRecording(){
+        //清0计数器
+        recordNoteCount = 0;
+        //加入最后一个note
+        if(!recordPreviousNote.equals(""))
+            NoteQueue.addNote(new Note(recordPreviousNote, (int)(System.currentTimeMillis() - recordPreviousInterval)));
         if(dispatcher != null){
             if(!dispatcher.isStopped())
                 dispatcher.stop();
             dispatcher = null;
         }
+        showMessage("Total " + NoteQueue.noteQueue.size() + " notes recognized!");
     }
 
     public void processPitch(float pitchInHz) {
-        if(pitchInHz == -1.0f)
+        if(pitchInHz == -1.0f) {
+            isRecordPreviousNoteValid = false;
             return;
+        }
         String noteName = NoteFrequencyTool.getNoteByFrequency(pitchInHz);
         if(noteName != null)
             ipText.setText(noteName);
-        Log.d("PitchDetect", "frequency: " + pitchInHz + "; note: " + noteName);
+        long currentInterval = System.currentTimeMillis();
+        //不是识别的第一个音符，就把前一个音符加进去
+        if(recordNoteCount != 0){
+            //如果note跟前一个一样且是有效的，那么当成同一个
+            assert noteName != null;
+            if(!noteName.equals(recordPreviousNote) && isRecordPreviousNoteValid) {
+                NoteQueue.addNote(new Note(recordPreviousNote, (int) (currentInterval - recordPreviousInterval)));
+                recordPreviousInterval = currentInterval;
+                recordPreviousNote = noteName;
+            }
+        }else{
+            recordPreviousInterval = currentInterval;
+            recordPreviousNote = noteName;
+        }
+        //识别音符加1
+        recordNoteCount++;
+        isRecordPreviousNoteValid = true;
     }
 
 }
