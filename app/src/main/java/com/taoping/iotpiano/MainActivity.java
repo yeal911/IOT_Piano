@@ -29,8 +29,6 @@ import com.taoping.notes.NoteQueue;
 import com.taoping.tool.NoteFrequencyTool;
 import com.taoping.tool.PermissionManager;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Objects;
 
 import be.tarsos.dsp.AudioDispatcher;
@@ -58,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
     private int recordNoteCount; //记录共识别录制了多少音符
     private String recordPreviousNote; //上一个识别的音符
     private boolean isRecordPreviousNoteValid; //上一个是否是有效的note
+
+    private boolean isRecordNotes;
 
     @SuppressLint({"ClickableViewAccessibility", "SetTextI18n"})
     @Override
@@ -109,8 +109,10 @@ public class MainActivity extends AppCompatActivity {
             // Perform action on click
             showMessage("Searching for IP receiver...");
         });
+        isRecordNotes = false;
         recordBtn.setOnClickListener(v -> {
             if(recordBtn.getText().equals("识别")){
+                isRecordNotes = true;
                 showMessage("Listening melody...");
                 NoteQueue.recordQueue.clear();
                 recordAndAnalyze();
@@ -126,14 +128,19 @@ public class MainActivity extends AppCompatActivity {
             showMessage("repeating melody...");
         });
         sendNoteBtn.setOnClickListener(v -> {
-            //把最后一个note加进去
-            if(keyPreviousPressed != -1){
-                NoteQueue.addNote(new Note(MainActivity.keyboardToneLevel, keyPreviousPressed, (int)(System.currentTimeMillis() - keyPreviousInterval)));
-            }
-            //发送完成之后，要清空前面的键
-            keyPreviousPressed = -1;
+            if(isRecordNotes){
+                isRecordNotes = false;
+                NoteQueue.sendRecordNotes();
+            }else {
+                //把最后一个note加进去
+                if (keyPreviousPressed != -1) {
+                    NoteQueue.addNote(new Note(MainActivity.keyboardToneLevel, keyPreviousPressed, (int) (System.currentTimeMillis() - keyPreviousInterval)));
+                }
+                //发送完成之后，要清空前面的键
+                keyPreviousPressed = -1;
 //            sendNoteBtn.setEnabled(false);
-            NoteQueue.sendNotes();
+                NoteQueue.sendPlayNotes();
+            }
             // Perform action on click
             showMessage("Sending notes...");
         });
@@ -226,7 +233,6 @@ public class MainActivity extends AppCompatActivity {
         animator.startAnimation(animation);
         animator.showNext();
     }
-
     private void showMessage(String msg){
         Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
     }
@@ -250,7 +256,6 @@ public class MainActivity extends AppCompatActivity {
         }else{
             noteCoverText.setVisibility(View.INVISIBLE);
         }
-
     }
 
     //播放对应的音
@@ -288,7 +293,6 @@ public class MainActivity extends AppCompatActivity {
         };
         AudioProcessor pitchProcessor = new PitchProcessor(PitchProcessor.PitchEstimationAlgorithm.FFT_YIN, 22050, 1024, pdh);
         dispatcher.addAudioProcessor(pitchProcessor);
-
         Thread audioThread = new Thread(dispatcher, "Audio Thread");
         audioThread.start();
     }
@@ -340,6 +344,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //识别的旋律和节奏，用钢琴音播放出来
+    @SuppressWarnings("BusyWait")
     private void repeatMelody() {
         try {
             playMelodyBtn.setEnabled(false);
