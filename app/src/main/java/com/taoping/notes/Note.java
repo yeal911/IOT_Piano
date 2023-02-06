@@ -11,9 +11,9 @@ public class Note {
     public int noteIndex; //音符的序号
     public int interval; //每个音符被按下的时长，单位毫秒
 
+    public float frequency; //识别模式下，记录识别的频率
     public String noteName; //音名
     public String intervalString;
-
     public String addTime;
 
     private static final Map<String, String> indexToNote = new HashMap<>();
@@ -142,9 +142,10 @@ public class Note {
     }
 
     @SuppressLint("SimpleDateFormat")
-    public Note(String noteName, int interval) {
+    public Note(String noteName, int interval, float frequency) {
         this.addTime = new SimpleDateFormat("hh:mm:ss:SSS").format(new Date());
         this.noteName = noteName;
+        this.frequency = frequency;
         this.interval = interval;
         if (interval > 10000)
             this.intervalString = "9999";

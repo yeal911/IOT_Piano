@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     private long recordPreviousInterval; //录音情况下上一个音符的时间，单位毫秒
     private int recordNoteCount; //记录共识别录制了多少音符
     private String recordPreviousNote; //上一个识别的音符
+    private float recordPreviousFrequency; //上一个识别的频率
     private boolean isRecordPreviousNoteValid; //上一个是否是有效的note
 
     private boolean isRecordNotes;
@@ -303,7 +304,7 @@ public class MainActivity extends AppCompatActivity {
         recordNoteCount = 0;
         //加入最后一个note
         if(!recordPreviousNote.equals(""))
-            NoteQueue.addRecordNote(new Note(recordPreviousNote, (int)(System.currentTimeMillis() - recordPreviousInterval)));
+            NoteQueue.addRecordNote(new Note(recordPreviousNote, (int)(System.currentTimeMillis() - recordPreviousInterval), recordPreviousFrequency));
         if(dispatcher != null){
             if(!dispatcher.isStopped())
                 dispatcher.stop();
@@ -328,15 +329,17 @@ public class MainActivity extends AppCompatActivity {
             assert noteName != null;
             if(!noteName.equals(recordPreviousNote) && isRecordPreviousNoteValid) {
 //                String time = new SimpleDateFormat("hh:mm:ss:SSS").format(new Date());
-                NoteQueue.addRecordNote(new Note(recordPreviousNote, (int) (currentInterval - recordPreviousInterval)));
+                NoteQueue.addRecordNote(new Note(recordPreviousNote, (int) (currentInterval - recordPreviousInterval), recordPreviousFrequency));
 //                Log.d("check pitch - step",  time + ": " + recordPreviousNote + ", " + (int) (currentInterval - recordPreviousInterval));
 //                Log.d("check pitch - noteQueue", ": \n" + NoteQueue.allRecordNotes());
                 recordPreviousInterval = currentInterval;
                 recordPreviousNote = noteName;
+                recordPreviousFrequency = pitchInHz;
             }
         }else{
             recordPreviousInterval = currentInterval;
             recordPreviousNote = noteName;
+            recordPreviousFrequency = pitchInHz;
         }
         //识别音符加1
         recordNoteCount++;
