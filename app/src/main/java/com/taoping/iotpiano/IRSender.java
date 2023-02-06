@@ -1,7 +1,5 @@
 package com.taoping.iotpiano;
 
-import android.app.Activity;
-import android.content.Context;
 import android.hardware.ConsumerIrManager;
 
 import java.util.ArrayList;
@@ -22,7 +20,7 @@ public class IRSender {
     private static int[] formPattern(int targetNumber){
         String targetBinString = Integer.toBinaryString(targetNumber);
         targetBinString = "00000000".substring(targetBinString.length()) + targetBinString;
-        ArrayList<Integer> pattern = new ArrayList<Integer>();
+        ArrayList<Integer> pattern = new ArrayList<>();
         addArray2List(pattern, IR_HEAD);
         for(int i=0;i<targetBinString.length();i++){
             int digit = Integer.parseInt(targetBinString.substring(i, i+1));
@@ -45,17 +43,6 @@ public class IRSender {
         if (mCIR.hasIrEmitter()) {
             //配置你要发送的红外码值   例：0xaabbdd22
             int[] pattern = formPattern(note);
-            //发送红外
-            // 在38.4KHz条件下进行模式转换
-            mCIR.transmit(38400, pattern);
-        }
-    }
-
-    public static void sendIRMute() {
-        //判断设备是否可用
-        if (mCIR.hasIrEmitter()) {
-            //发送8位全是1的信号，表是静音
-            int[] pattern = formPattern(255);
             //发送红外
             // 在38.4KHz条件下进行模式转换
             mCIR.transmit(38400, pattern);

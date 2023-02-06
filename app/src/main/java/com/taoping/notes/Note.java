@@ -10,7 +10,6 @@ import java.util.Map;
 public class Note {
     public int noteIndex; //音符的序号
     public int interval; //每个音符被按下的时长，单位毫秒
-
     public float frequency; //识别模式下，记录识别的频率
     public String noteName; //音名
     public String intervalString;

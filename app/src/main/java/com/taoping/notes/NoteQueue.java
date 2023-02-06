@@ -90,6 +90,7 @@ public class NoteQueue {
                     while(!noteQueue.isEmpty()){
                         // 要发送的字符串
                         Note note = noteQueue.poll();
+                        assert note != null;
                         message.append(note.noteName);
                         message.append(note.intervalString);
                     }
@@ -127,6 +128,7 @@ public class NoteQueue {
                     while(!recordQueue.isEmpty()){
                         // 要发送的字符串
                         Note note = recordQueue.poll();
+                        assert note != null;
                         message.append(note.noteName);
                         message.append(note.intervalString);
                     }
@@ -171,9 +173,12 @@ public class NoteQueue {
         StringBuilder res = new StringBuilder();
         while(!tmp.isEmpty()){
             Note noteTmp = tmp.poll();
+            assert noteTmp != null;
             res.append(noteTmp.addTime);
             res.append(": ");
             res.append(noteTmp.noteName);
+            res.append(", ");
+            res.append(noteTmp.frequency);
             res.append(", ");
             res.append(noteTmp.interval);
             res.append("\n");

@@ -330,8 +330,6 @@ public class MainActivity extends AppCompatActivity {
             if(!noteName.equals(recordPreviousNote) && isRecordPreviousNoteValid) {
 //                String time = new SimpleDateFormat("hh:mm:ss:SSS").format(new Date());
                 NoteQueue.addRecordNote(new Note(recordPreviousNote, (int) (currentInterval - recordPreviousInterval), recordPreviousFrequency));
-//                Log.d("check pitch - step",  time + ": " + recordPreviousNote + ", " + (int) (currentInterval - recordPreviousInterval));
-//                Log.d("check pitch - noteQueue", ": \n" + NoteQueue.allRecordNotes());
                 recordPreviousInterval = currentInterval;
                 recordPreviousNote = noteName;
                 recordPreviousFrequency = pitchInHz;
